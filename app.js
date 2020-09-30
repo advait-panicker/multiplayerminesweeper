@@ -3,6 +3,8 @@ const app = express();
 app.use(express.static(`${__dirname}/public`));
 const serv = require('http').Server(app);
 
+let Grid = require('./game/grid.js');
+
 // Setup
 serv.on('error', (err) => {
     console.error('Server error: ', err);
@@ -12,39 +14,19 @@ serv.listen(process.env.PORT || 2000, () => {
     console.log('Server Started');
 });
 
+// Board setup
+let board = new Grid(10, 10);
+
 // Connection
 const io = require('socket.io')(serv, {});
 io.sockets.on('connect', function(socket) {
     console.log(socket.id);
+    socket.on('uncover', pos => {
+        board.uncover(pos);
+    });
 });
-// Board setup
-let grid = [];
-let mines = [];
-let mineCount = 10;
-let boardWidth = 10;
-let boardSize = boardWidth*boardWidth;
-for (let i = 0; i < boardSize; i++) {
-    grid[i] = 0;
-}
-while (mines.length < mineCount) {
-    const pos = Math.floor(Math.random()*boardSize);
-    if (mines.indexOf(pos) == -1) {
-        mines.push(pos);
-        for (let y = -1; y < 2; y++) {
-            for (let x = -1; x < 2; x++) {
-                let xpos = pos % boardWidth + x;
-                let ypos = Math.floor(pos/boardWidth) + y;
-                if (!(xpos >= boardWidth || xpos < 0 || ypos >= boardWidth || ypos < 0) && grid[pos+y*boardWidth+x] != -1) {
-                    grid[pos+y*boardWidth+x]++;
-                }
-            }
-        }
-        grid[pos] = -1;
-    }
-}
-console.log(mines);
-console.log(grid);
+
 // Game loop
 setInterval(function() {
-
+    io.emit('currBoard', board.viewable);
 },80);
