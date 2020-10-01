@@ -6,7 +6,10 @@
     <title>Minesweeper</title>
 </head>
 <body>
-    <h1 id="win"></h1>
+    <div id="win-box" style="display: none;">
+        <h1>You Win!</h1>
+        <button onclick="restart()">Restart</button>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/p5@1.1.9/lib/p5.js"></script>
     <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
     <script src="main.js"></script>

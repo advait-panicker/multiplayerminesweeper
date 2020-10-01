@@ -30,6 +30,12 @@ io.sockets.on('connect', function(socket) {
         board.flag(pos);
         newState();
     });
+    socket.on('restart', () => {
+        if (board.checkState()) {
+            board = new Grid(10, 10);
+            newState();
+        }
+    });
 });
 
 function newState() {
