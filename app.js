@@ -15,24 +15,27 @@ serv.listen(process.env.PORT || 2000, () => {
 });
 
 // Board setup
-let board = new Grid(10, 10);
+let board = new Grid(10, 20);
 
 // Connection
+let PLAYER_LIST = {};
+
 const io = require('socket.io')(serv, {});
 io.sockets.on('connect', function(socket) {
-    console.log(socket.id);
+    PLAYER_LIST[socket.id] = {color : [Math.random(), Math.random(), Math.random()]};
+    console.log(PLAYER_LIST[socket.id]);
     newState();
     socket.on('uncover', pos => {
-        board.uncover(pos);
+        board.uncover(pos, PLAYER_LIST[socket.id].color);
         newState();
     });
     socket.on('flag', pos => {
-        board.flag(pos);
+        board.flag(pos, PLAYER_LIST[socket.id].color);
         newState();
     });
     socket.on('restart', () => {
         if (board.checkState()) {
-            board = new Grid(10, 10);
+            board = new Grid(10, 20);
             newState();
         }
     });
@@ -40,7 +43,5 @@ io.sockets.on('connect', function(socket) {
 
 function newState() {
     io.emit('currBoard', board.viewable);
-    if (board.checkState()) {
-        io.emit('win');
-    }
+    io.emit('win', board.checkState());
 }

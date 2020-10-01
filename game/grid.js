@@ -37,19 +37,23 @@ class Grid {
             }
         }
         for (let i = 0; i < this.gridSize; i++) {
-            this.viewable[i] = this.grid[i].covered ? this.grid[i].flagged : this.grid[i].value;
+            this.viewable[i] = {value : this.grid[i].covered ? this.grid[i].flagged : this.grid[i].value, color : null};
         }
     }
-    flag(pos) {
-        if (typeof this.viewable[pos] == 'boolean') {
-            this.viewable[pos] = !this.viewable[pos];
+    flag(pos, color) {
+        if (typeof this.viewable[pos].value == 'boolean') {
+            this.viewable[pos].value = !this.viewable[pos].value;
+            this.viewable[pos].color = this.viewable[pos].value ? color : null;
         }
     }
-    show(pos) {
-        this.viewable[pos] = this.grid[pos].value;
+    show(pos, color) {
+        this.viewable[pos].value = this.grid[pos].value;
+        if (this.viewable[pos].color == null) {
+            this.viewable[pos].color = color;
+        }
     }
-    uncover(pos) {
-        this.show(pos);
+    uncover(pos, color) {
+        this.show(pos, color);
         if (this.grid[pos].value == 0) {
             for (let y = -1; y <= 1; y++) {
                 let j = Math.floor(pos/this.gridWidth) + y;
@@ -59,11 +63,11 @@ class Grid {
                     if (i < 0 || i >= this.gridWidth) {break;}
                     let newpos = pos + y * this.gridWidth + x;
                     console.log(newpos);
-                    if (this.grid[newpos].value != -1 && typeof this.viewable[newpos] == 'boolean') {
+                    if (this.grid[newpos].value != -1 && typeof this.viewable[newpos].value == 'boolean') {
                         if (this.grid[newpos].value == 0) {
-                            this.uncover(newpos);
+                            this.uncover(newpos, color);
                         } else {
-                            this.show(newpos);
+                            this.show(newpos, color);
                         }
                     }
                 }
@@ -73,7 +77,7 @@ class Grid {
     checkState() {
         let win = true;
         for (let i = 0; i < this.mineCount; i++) {
-            let cell = this.viewable[this.mines[i]];
+            let cell = this.viewable[this.mines[i]].value;
             if (cell != true && cell != -1) {
                 win = false;
             }
