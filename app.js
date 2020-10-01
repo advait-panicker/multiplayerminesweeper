@@ -34,4 +34,7 @@ io.sockets.on('connect', function(socket) {
 
 function newState() {
     io.emit('currBoard', board.viewable);
+    if (board.checkState()) {
+        io.emit('win');
+    }
 }

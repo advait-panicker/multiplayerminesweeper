@@ -4,6 +4,9 @@ let grid;
 socket.on('currBoard', (newboard) => {
     grid = newboard;
 });
+socket.on('win', () => {
+    document.getElementById('win').innerText = 'You win!';
+});
 const gridWidth = 10;
 const gridSize = gridWidth * gridWidth;
 const cellSize = 50;

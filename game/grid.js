@@ -70,5 +70,15 @@ class Grid {
             }
         }
     }
+    checkState() {
+        let win = true;
+        for (let i = 0; i < this.mineCount; i++) {
+            let cell = this.viewable[this.mines[i]];
+            if (cell != true && cell != -1) {
+                win = false;
+            }
+        }
+        return win;
+    }
 }
 module.exports = Grid;
