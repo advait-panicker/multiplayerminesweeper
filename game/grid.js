@@ -1,9 +1,13 @@
+function clamp(a, min, max) {
+    return Math.max(Math.min(a, max), min);
+}
 class Cell {
     constructor(value) {
         this.value = value;
         this.covered = true;
     }
 }
+const lst = [[-1, 0], [1, 0], [0, -1], [0, 1]];
 class Grid {
     constructor (gridWidth, mineCount) {
         this.gridWidth = gridWidth;
@@ -39,6 +43,17 @@ class Grid {
         this.viewable[pos] = this.grid[pos];
     }
     uncover(pos) {
+        this.show(pos);
+        if (this.grid[pos].value != -1) {
+            lst.forEach((p) => {
+                let x = p[0], y = p[1]; 
+                let newpos = clamp(pos + y * this.gridWidth + clamp(x, 0, this.gridWidth-1), 0, this.gridSize-1);
+                console.log(newpos);
+                if (this.grid[newpos].value != -1 && this.viewable[newpos] == null) {
+                    this.uncover(newpos);
+                }
+            });
+        }
     }
 }
 module.exports = Grid;

@@ -15,7 +15,7 @@ serv.listen(process.env.PORT || 2000, () => {
 });
 
 // Board setup
-let board = new Grid(10, 10);
+let board = new Grid(10, 20);
 
 // Connection
 const io = require('socket.io')(serv, {});

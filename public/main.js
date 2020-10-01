@@ -1,3 +1,4 @@
+document.addEventListener('contextmenu', event => event.preventDefault());
 let socket = io();
 let grid;
 socket.on('currBoard', (newboard) => {
@@ -26,10 +27,15 @@ function draw() {
         }
     }
 }
-function mouseClicked() {
+function mouseClicked(event) {
     const x = Math.floor(mouseX/cellSize);
     const y = Math.floor(mouseY/cellSize);
     const pos = y * gridWidth + x;
-    console.log('click', x, y, pos);
-    socket.emit('uncover', pos);
+    console.log({x, y, pos, event});
+    if (mouseButton === LEFT) {
+        socket.emit('uncover', pos);
+    }
+    // if (mouseButton === RIGHT) {
+    //     socket.emit('flag', pos);
+    // }
 }
