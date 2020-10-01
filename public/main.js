@@ -17,25 +17,36 @@ function draw() {
         for (let i = 0; i < gridSize; i++) {
             const x = (i % gridWidth)*cellSize;
             const y = ((i-x/cellSize)/gridWidth)*cellSize;
-            if (grid[i]) {
-                fill(255);
-                text(grid[i].value, x+10, y+cellSize-5);
-            } else {
-                fill(100);
-                rect(x, y, cellSize, cellSize);
+            switch (grid[i]) {
+                case true:
+                    fill(255, 0, 0);
+                    rect(x, y, cellSize, cellSize);
+                    break;
+                case false:
+                    fill(100);
+                    rect(x, y, cellSize, cellSize);
+                    break;
+                case -1:
+                    fill(50);
+                    ellipse(x+0.5*cellSize, y+0.5*cellSize, cellSize*0.9, cellSize*0.9);
+                    break;
+                default:
+                    fill(255);
+                    text(grid[i], x+10, y+cellSize-5);    
             }
         }
     }
 }
-function mouseClicked(event) {
+function mousePressed() {
     const x = Math.floor(mouseX/cellSize);
     const y = Math.floor(mouseY/cellSize);
     const pos = y * gridWidth + x;
-    console.log({x, y, pos, event});
+    // console.log({x, y, pos});
     if (mouseButton === LEFT) {
         socket.emit('uncover', pos);
     }
-    // if (mouseButton === RIGHT) {
-    //     socket.emit('flag', pos);
-    // }
+    if (mouseButton === RIGHT) {
+        console.log('works');
+        socket.emit('flag', pos);
+    }
 }

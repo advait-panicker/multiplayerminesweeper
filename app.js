@@ -15,18 +15,23 @@ serv.listen(process.env.PORT || 2000, () => {
 });
 
 // Board setup
-let board = new Grid(10, 20);
+let board = new Grid(10, 10);
 
 // Connection
 const io = require('socket.io')(serv, {});
 io.sockets.on('connect', function(socket) {
     console.log(socket.id);
+    newState();
     socket.on('uncover', pos => {
         board.uncover(pos);
+        newState();
+    });
+    socket.on('flag', pos => {
+        board.flag(pos);
+        newState();
     });
 });
 
-// Game loop
-setInterval(function() {
+function newState() {
     io.emit('currBoard', board.viewable);
-},80);
+}

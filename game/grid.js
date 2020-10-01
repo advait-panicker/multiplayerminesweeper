@@ -5,6 +5,7 @@ class Cell {
     constructor(value) {
         this.value = value;
         this.covered = true;
+        this.flagged = false;
     }
 }
 const lst = [[-1, 0], [1, 0], [0, -1], [0, 1]];
@@ -36,23 +37,37 @@ class Grid {
             }
         }
         for (let i = 0; i < this.gridSize; i++) {
-            this.viewable[i] = this.grid[i].covered ? null : this.grid[i].value;
+            this.viewable[i] = this.grid[i].covered ? this.grid[i].flagged : this.grid[i].value;
+        }
+    }
+    flag(pos) {
+        if (typeof this.viewable[pos] == 'boolean') {
+            this.viewable[pos] = !this.viewable[pos];
         }
     }
     show(pos) {
-        this.viewable[pos] = this.grid[pos];
+        this.viewable[pos] = this.grid[pos].value;
     }
     uncover(pos) {
         this.show(pos);
-        if (this.grid[pos].value != -1) {
-            lst.forEach((p) => {
-                let x = p[0], y = p[1]; 
-                let newpos = clamp(pos + y * this.gridWidth + clamp(x, 0, this.gridWidth-1), 0, this.gridSize-1);
-                console.log(newpos);
-                if (this.grid[newpos].value != -1 && this.viewable[newpos] == null) {
-                    this.uncover(newpos);
+        if (this.grid[pos].value == 0) {
+            for (let y = -1; y <= 1; y++) {
+                let j = Math.floor(pos/this.gridWidth) + y;
+                if (j < 0 || j >= this.gridWidth) {break;}
+                for (let x = -1; x <= 1; x++) { 
+                    let i = pos % this.gridWidth + x;
+                    if (i < 0 || i >= this.gridWidth) {break;}
+                    let newpos = pos + y * this.gridWidth + x;
+                    console.log(newpos);
+                    if (this.grid[newpos].value != -1 && typeof this.viewable[newpos] == 'boolean') {
+                        if (this.grid[newpos].value == 0) {
+                            this.uncover(newpos);
+                        } else {
+                            this.show(newpos);
+                        }
+                    }
                 }
-            });
+            }
         }
     }
 }
