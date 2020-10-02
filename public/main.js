@@ -1,5 +1,13 @@
 document.addEventListener('contextmenu', event => event.preventDefault());
 let socket = io();
+let inGame = false;
+function onJoin() {
+    let name = document.getElementById('username-input').value;
+    socket.emit('signIn', name);
+    document.getElementById('login-wrapper').style.display = "none";
+    document.getElementById('game').style.display = "block";
+    inGame = true;
+}
 let grid;
 socket.on('currBoard', (newboard) => {
     grid = newboard;
@@ -10,6 +18,17 @@ socket.on('win', (win) => {
 function restart() {
     socket.emit('restart');
 }
+socket.on('newPlayer', (PLAYER_LIST) => {
+    let list = document.getElementById('player-list');
+    list.innerHTML = '<th>Player</th><th>Mines</th><th>Flags</th><th>Uncovers</th>';
+    for (let v in PLAYER_LIST) {
+        const {name, color, mines, flags, uncovers} = PLAYER_LIST[v];
+        const player = document.createElement("tr");
+        player.innerHTML = `<td>${name}</td><td>${mines}</td><td>${flags}</td><td>${uncovers}</td>`;
+        player.style =  `color:rgb(${color[0]*256},${color[1]*256},${color[2]*256});`;
+        list.append(player);
+    }
+});
 
 const gridWidth = 10;
 const gridSize = gridWidth * gridWidth;
@@ -21,7 +40,8 @@ const dirs = [
     {xoff :  1, yoff :  0,   x1 : 1, y1 : 0, x2 : 1, y2 : 1}
 ];
 function setup() {
-    createCanvas(gridWidth*cellSize,gridWidth*cellSize);
+    let canvas = createCanvas(gridWidth*cellSize,gridWidth*cellSize);
+    canvas.parent('game');
 }
 function draw() {
     background(0);
@@ -90,15 +110,17 @@ function compColor(c1, c2) {
     return true;
 }
 function mousePressed() {
-    if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
-        const x = Math.floor(mouseX/cellSize);
-        const y = Math.floor(mouseY/cellSize);
-        const pos = y * gridWidth + x;
-        if (mouseButton === LEFT) {
-            socket.emit('uncover', pos);
-        }
-        if (mouseButton === RIGHT) {
-            socket.emit('flag', pos);
+    if (inGame) {
+        if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
+            const x = Math.floor(mouseX/cellSize);
+            const y = Math.floor(mouseY/cellSize);
+            const pos = y * gridWidth + x;
+            if (mouseButton === LEFT) {
+                socket.emit('uncover', pos);
+            }
+            if (mouseButton === RIGHT) {
+                socket.emit('flag', pos);
+            }
         }
     }
 }

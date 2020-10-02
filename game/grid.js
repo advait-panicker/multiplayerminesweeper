@@ -40,20 +40,25 @@ class Grid {
             this.viewable[i] = {value : this.grid[i].covered ? this.grid[i].flagged : this.grid[i].value, color : null};
         }
     }
-    flag(pos, color) {
+    flag(pos, player) {
         if (typeof this.viewable[pos].value == 'boolean') {
             this.viewable[pos].value = !this.viewable[pos].value;
-            this.viewable[pos].color = this.viewable[pos].value ? color : null;
+            this.viewable[pos].color = this.viewable[pos].value ? player.color : null;
+            player.flags++;
         }
     }
-    show(pos, color) {
+    show(pos, player) {
         this.viewable[pos].value = this.grid[pos].value;
         if (this.viewable[pos].color == null) {
-            this.viewable[pos].color = color;
+            this.viewable[pos].color = player.color;
+            if (this.viewable[pos].value == -1) {
+                player.mines++;
+            }
+            player.uncovers++;
         }
     }
-    uncover(pos, color) {
-        this.show(pos, color);
+    uncover(pos, player) {
+        this.show(pos, player);
         if (this.grid[pos].value == 0) {
             for (let y = -1; y <= 1; y++) {
                 let j = Math.floor(pos/this.gridWidth) + y;
@@ -65,9 +70,9 @@ class Grid {
                     console.log(newpos);
                     if (this.grid[newpos].value != -1 && typeof this.viewable[newpos].value == 'boolean') {
                         if (this.grid[newpos].value == 0) {
-                            this.uncover(newpos, color);
+                            this.uncover(newpos, player);
                         } else {
-                            this.show(newpos, color);
+                            this.show(newpos, player);
                         }
                     }
                 }

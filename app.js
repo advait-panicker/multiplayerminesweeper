@@ -22,15 +22,23 @@ let PLAYER_LIST = {};
 
 const io = require('socket.io')(serv, {});
 io.sockets.on('connect', function(socket) {
-    PLAYER_LIST[socket.id] = {color : [Math.random(), Math.random(), Math.random()]};
-    console.log(PLAYER_LIST[socket.id]);
-    newState();
+    socket.on('signIn', (name) => {
+        PLAYER_LIST[socket.id] = {
+            color : [Math.random(), Math.random(), Math.random()],
+            name : name,
+            mines : 0,
+            flags : 0,
+            uncovers : 0
+        };
+        console.log(PLAYER_LIST[socket.id]);
+        newState();
+    });
     socket.on('uncover', pos => {
-        board.uncover(pos, PLAYER_LIST[socket.id].color);
+        board.uncover(pos, PLAYER_LIST[socket.id]);
         newState();
     });
     socket.on('flag', pos => {
-        board.flag(pos, PLAYER_LIST[socket.id].color);
+        board.flag(pos, PLAYER_LIST[socket.id]);
         newState();
     });
     socket.on('restart', () => {
@@ -39,9 +47,14 @@ io.sockets.on('connect', function(socket) {
             newState();
         }
     });
+    socket.on('disconnect', () => {
+        delete PLAYER_LIST[socket.id];
+        io.emit('newPlayer', PLAYER_LIST);
+    });
 });
 
 function newState() {
+    io.emit('newPlayer', PLAYER_LIST);
     io.emit('currBoard', board.viewable);
     io.emit('win', board.checkState());
 }
