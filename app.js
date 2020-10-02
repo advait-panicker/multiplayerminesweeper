@@ -15,7 +15,7 @@ serv.listen(process.env.PORT || 2000, () => {
 });
 
 // Board setup
-let board = new Grid(10, 20);
+let board = new Grid(10, 1);
 
 // Connection
 let PLAYER_LIST = {};
@@ -44,6 +44,12 @@ io.sockets.on('connect', function(socket) {
     socket.on('restart', () => {
         if (board.checkState()) {
             board = new Grid(10, 20);
+            for (let a in PLAYER_LIST) {
+                console.log(PLAYER_LIST[a]);
+                PLAYER_LIST[a].mines = 0;
+                PLAYER_LIST[a].flags = 0;
+                PLAYER_LIST[a].uncovers = 0;
+            }
             newState();
         }
     });

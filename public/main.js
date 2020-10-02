@@ -19,7 +19,7 @@ function restart() {
     socket.emit('restart');
 }
 socket.on('newPlayer', (PLAYER_LIST) => {
-    let list = document.getElementById('player-list');
+    let list = document.getElementById('player-list').children[0];
     list.innerHTML = '<th>Player</th><th>Mines</th><th>Flags</th><th>Uncovers</th>';
     for (let v in PLAYER_LIST) {
         const {name, color, mines, flags, uncovers} = PLAYER_LIST[v];
@@ -39,9 +39,16 @@ const dirs = [
     {xoff : -1, yoff :  0,   x1 : 0, y1 : 0, x2 : 0, y2 : 1},
     {xoff :  1, yoff :  0,   x1 : 1, y1 : 0, x2 : 1, y2 : 1}
 ];
+let mineimg, flagimg;
+function preload() {
+    mineimg = loadImage('images/mine.png');
+    flagimg = loadImage('images/flag.png');
+}
 function setup() {
     let canvas = createCanvas(gridWidth*cellSize,gridWidth*cellSize);
     canvas.parent('game');
+    mineimg.resize(cellSize, cellSize);
+    flagimg.resize(cellSize, cellSize);
 }
 function draw() {
     background(0);
@@ -56,16 +63,14 @@ function draw() {
             rect(x, y, cellSize, cellSize);
             switch (grid[i].value) {
                 case true:
-                    fill(255, 0, 0);
-                    rect(x, y, cellSize, cellSize);
+                    image(flagimg, x, y);
                     break;
                 case false:
                     fill(100);
                     rect(x, y, cellSize, cellSize);
                     break;
                 case -1:
-                    fill(50);
-                    ellipse(x+0.5*cellSize, y+0.5*cellSize, cellSize*0.9, cellSize*0.9);
+                    image(mineimg, x, y);
                     break;
                 case 0:
                     break;
