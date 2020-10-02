@@ -4,29 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minesweeper</title>
-    <style>
-        main {
-            margin-top: 1em;
-        }
-        #login-wrapper {
-            width: fit-content;
-            margin: auto;
-        }
-        #game {
-            width: fit-content;
-            margin: auto;
-        }
-        #player-list {
-            float: left;
-        }
-        #player-list tr th {
-            text-align: left;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <main>
         <div id="login-wrapper">
+            <h1>Multiplayer Minesweeper</h1>
             <input type="text" placeholder="Name" id="username-input">
             <button onclick="onJoin()">Play</button>
         </div>
