@@ -10,13 +10,24 @@ function onJoin() {
 }
 let grid;
 socket.on('currBoard', (newboard) => {
-    grid = newboard;
+    grid = newboard.board;
+    gridWidth = newboard.size;
+    gridSize = gridWidth * gridWidth;
+    cellSize = width/gridWidth;
+    mineimg.resize(cellSize, cellSize);
+    flagimg.resize(cellSize, cellSize); 
 });
 socket.on('win', (win) => {
-    document.getElementById('win-box').style.display = win ? 'block' : 'none';
+    if (inGame) {
+        document.getElementById('win-box').style.display = win ? 'block' : 'none';
+    }
 });
 function restart() {
-    socket.emit('restart');
+    let size = parseInt(document.getElementById('size-input').value, 10);
+    console.log(size >= 10, size <= 30);
+    if (size >= 10 && size <= 30) {
+        socket.emit('restart', size);
+    }
 }
 socket.on('newPlayer', (PLAYER_LIST) => {
     let list = document.getElementById('player-list').children[0];
@@ -29,10 +40,10 @@ socket.on('newPlayer', (PLAYER_LIST) => {
         list.append(player);
     }
 });
-
-const gridWidth = 10;
-const gridSize = gridWidth * gridWidth;
-const cellSize = 50;
+let gridWidth = 10;
+let gridSize = gridWidth * gridWidth;
+let cellSize = 50;
+let cv = 32;
 const dirs = [
     {xoff :  0, yoff : -1,   x1 : 0, y1 : 0, x2 : 1, y2 : 0},
     {xoff :  0, yoff :  1,   x1 : 0, y1 : 1, x2 : 1, y2 : 1},
@@ -58,7 +69,12 @@ function draw() {
         for (let i = 0; i < gridSize; i++) {
             const x = (i % gridWidth)*cellSize;
             const y = ((i-x/cellSize)/gridWidth)*cellSize;
-            fill(0);
+            const c = grid[i].color;
+            if (c) {
+                fill(c[0]*cv, c[1]*cv, c[2]*cv);
+            } else {
+                fill(0);
+            }
             stroke(50);
             rect(x, y, cellSize, cellSize);
             switch (grid[i].value) {
@@ -73,8 +89,12 @@ function draw() {
                     image(mineimg, x, y);
                     break;
                 case 0:
+                    fill(c[0]*cv, c[1]*cv, c[2]*cv);
+                    rect(x, y, cellSize, cellSize);
                     break;
                 default:
+                    fill(c[0]*cv, c[1]*cv, c[2]*cv);
+                    rect(x, y, cellSize, cellSize);
                     fill(255);
                     text(grid[i].value, x+cellSize/5, y+0.9*cellSize);    
             }

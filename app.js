@@ -24,7 +24,7 @@ const io = require('socket.io')(serv, {});
 io.sockets.on('connect', function(socket) {
     socket.on('signIn', (name) => {
         PLAYER_LIST[socket.id] = {
-            color : [Math.random(), Math.random(), Math.random()],
+            color : [Math.random()/2+0.5, Math.random()/2+0.5, Math.random()/2+0.5],
             name : name,
             mines : 0,
             flags : 0,
@@ -41,9 +41,9 @@ io.sockets.on('connect', function(socket) {
         board.flag(pos, PLAYER_LIST[socket.id]);
         newState();
     });
-    socket.on('restart', () => {
+    socket.on('restart', (size) => {
         if (board.checkState()) {
-            board = new Grid(10, 20);
+            board = new Grid(size, Math.floor(size*size*0.2));
             for (let a in PLAYER_LIST) {
                 console.log(PLAYER_LIST[a]);
                 PLAYER_LIST[a].mines = 0;
@@ -61,6 +61,6 @@ io.sockets.on('connect', function(socket) {
 
 function newState() {
     io.emit('newPlayer', PLAYER_LIST);
-    io.emit('currBoard', board.viewable);
+    io.emit('currBoard', {board : board.viewable, size : board.gridWidth});
     io.emit('win', board.checkState());
 }
