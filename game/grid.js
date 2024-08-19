@@ -7,6 +7,9 @@ class Cell {
         this.covered = true;
         this.flagged = false;
     }
+    resetCell() {
+        this.value = 0;
+    }
 }
 const lst = [[-1, 0], [1, 0], [0, -1], [0, 1]];
 class Grid {
@@ -17,13 +20,17 @@ class Grid {
         this.grid = [];
         this.mines = [];
         this.viewable = [];
+        for (let i = 0; i < this.gridSize; i++) {
+            this.grid[i] = new Cell(0);
+        }
         this.resetBoard();
         this.firstTurn = true;
     }
     resetBoard() {
         for (let i = 0; i < this.gridSize; i++) {
-            this.grid[i] = new Cell(0);
+            this.grid[i].resetCell();
         }
+        this.mines = [];
         while (this.mines.length < this.mineCount) {
             const pos = Math.floor(Math.random()*this.gridSize);
             if (this.mines.indexOf(pos) == -1) {
@@ -63,6 +70,7 @@ class Grid {
     }
     uncover(pos, player) {
         while (this.firstTurn && this.grid[pos].value != 0) {
+            console.log('reset');
             this.resetBoard();
         }
         this.firstTurn = false;
@@ -75,7 +83,6 @@ class Grid {
                     let i = pos % this.gridWidth + x;
                     if (i < 0 || i >= this.gridWidth) {break;}
                     let newpos = pos + y * this.gridWidth + x;
-                    console.log(newpos);
                     if (this.grid[newpos].value != -1 && typeof this.viewable[newpos].value == 'boolean') {
                         if (this.grid[newpos].value == 0) {
                             this.uncover(newpos, player);

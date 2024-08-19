@@ -11,7 +11,7 @@ serv.on('error', (err) => {
 });
 
 serv.listen(process.env.PORT || 2000, () => {
-    console.log('Server Started');
+    console.log('Server Started on port 2000!');
 });
 
 // Board setup
