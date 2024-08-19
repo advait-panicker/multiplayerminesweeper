@@ -62,7 +62,7 @@ class Grid {
         }
     }
     uncover(pos, player) {
-        while (this.firstTurn && this.grid[pos].value == -1) {
+        while (this.firstTurn && this.grid[pos].value != 0) {
             this.resetBoard();
         }
         this.firstTurn = false;
