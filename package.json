@@ -10,8 +10,8 @@
   "author": "advait",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1",
+    "express": "^4.17.2",
     "io": "^1.0.3",
-    "socket.io": "^2.3.0"
+    "socket.io": "^2.4.1"
   }
 }
