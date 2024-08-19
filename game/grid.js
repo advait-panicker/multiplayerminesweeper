@@ -17,19 +17,23 @@ class Grid {
         this.grid = [];
         this.mines = [];
         this.viewable = [];
+        this.resetBoard();
+        this.firstTurn = true;
+    }
+    resetBoard() {
         for (let i = 0; i < this.gridSize; i++) {
             this.grid[i] = new Cell(0);
         }
-        while (this.mines.length < mineCount) {
+        while (this.mines.length < this.mineCount) {
             const pos = Math.floor(Math.random()*this.gridSize);
             if (this.mines.indexOf(pos) == -1) {
                 this.mines.push(pos);
                 for (let y = -1; y < 2; y++) {
                     for (let x = -1; x < 2; x++) {
-                        let xpos = pos % gridWidth + x;
-                        let ypos = Math.floor(pos/gridWidth) + y;
-                        if (!(xpos >= gridWidth || xpos < 0 || ypos >= gridWidth || ypos < 0) && this.grid[pos+y*gridWidth+x].value != -1) {
-                            this.grid[pos+y*gridWidth+x].value++;
+                        let xpos = pos % this.gridWidth + x;
+                        let ypos = Math.floor(pos/this.gridWidth) + y;
+                        if (!(xpos >= this.gridWidth || xpos < 0 || ypos >= this.gridWidth || ypos < 0) && this.grid[pos+y*this.gridWidth+x].value != -1) {
+                            this.grid[pos+y*this.gridWidth+x].value++;
                         }
                     }
                 }
@@ -58,6 +62,10 @@ class Grid {
         }
     }
     uncover(pos, player) {
+        while (this.firstTurn && this.grid[pos].value == -1) {
+            this.resetBoard();
+        }
+        this.firstTurn = false;
         this.show(pos, player);
         if (this.grid[pos].value == 0) {
             for (let y = -1; y <= 1; y++) {
